@@ -9,16 +9,26 @@ resource "yandex_vpc_network" "this" {
 }
 
 ###############################################################################
-# Публичная подсеть (одна, в зоне A) — bastion, ALB, grafana, kibana
+# Публичные подсети — по одной на зону (для ALB в нескольких зонах).
+# bastion / grafana / kibana — в подсети основной зоны.
 ###############################################################################
 
 resource "yandex_vpc_subnet" "public" {
-  name           = "${var.vpc_name}-public-${var.public_subnet_zone}"
-  description    = "Публичная подсеть (bastion, ALB, grafana, kibana)"
-  zone           = var.public_subnet_zone
+  for_each = var.public_subnets
+
+  name           = "${var.vpc_name}-public-${each.key}"
+  description    = "Публичная подсеть зоны ${each.key}"
+  zone           = each.key
   network_id     = yandex_vpc_network.this.id
-  v4_cidr_blocks = [var.public_subnet_cidr]
+  v4_cidr_blocks = [each.value]
   labels         = var.labels
+}
+
+# Переименование state без destroy/create:
+# раньше был один resource yandex_vpc_subnet.public, теперь — for_each по картам.
+moved {
+  from = yandex_vpc_subnet.public
+  to   = yandex_vpc_subnet.public["ru-central1-a"]
 }
 
 ###############################################################################

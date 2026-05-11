@@ -39,10 +39,13 @@ variable "vpc_name" {
   default     = "diplom-vpc"
 }
 
-variable "public_subnet_cidr" {
-  description = "CIDR публичной подсети (zone A)"
-  type        = string
-  default     = "10.10.1.0/24"
+variable "public_subnets" {
+  description = "CIDR публичных подсетей по зонам (ALB живёт в обеих)"
+  type        = map(string)
+  default = {
+    "ru-central1-a" = "10.10.1.0/24"
+    "ru-central1-b" = "10.10.2.0/24"
+  }
 }
 
 variable "private_subnets" {

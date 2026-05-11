@@ -3,14 +3,9 @@ output "network_id" {
   value       = yandex_vpc_network.this.id
 }
 
-output "public_subnet_id" {
-  description = "ID публичной подсети"
-  value       = yandex_vpc_subnet.public.id
-}
-
-output "public_subnet_zone" {
-  description = "Зона публичной подсети"
-  value       = yandex_vpc_subnet.public.zone
+output "public_subnet_ids" {
+  description = "Map: зона => ID публичной подсети"
+  value       = { for zone, s in yandex_vpc_subnet.public : zone => s.id }
 }
 
 output "private_subnet_ids" {

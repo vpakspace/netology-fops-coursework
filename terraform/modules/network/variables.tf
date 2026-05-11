@@ -4,15 +4,9 @@ variable "vpc_name" {
   default     = "diplom-vpc"
 }
 
-variable "public_subnet_cidr" {
-  description = "CIDR публичной подсети"
-  type        = string
-}
-
-variable "public_subnet_zone" {
-  description = "Зона публичной подсети (где будут bastion, grafana, kibana)"
-  type        = string
-  default     = "ru-central1-a"
+variable "public_subnets" {
+  description = "Map: зона => CIDR публичной подсети. Минимум одна зона."
+  type        = map(string)
 }
 
 variable "private_subnets" {

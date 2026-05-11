@@ -14,11 +14,10 @@ data "yandex_compute_image" "ubuntu" {
 module "network" {
   source = "./modules/network"
 
-  vpc_name           = var.vpc_name
-  public_subnet_cidr = var.public_subnet_cidr
-  public_subnet_zone = var.default_zone
-  private_subnets    = var.private_subnets
-  labels             = var.project_tag
+  vpc_name        = var.vpc_name
+  public_subnets  = var.public_subnets
+  private_subnets = var.private_subnets
+  labels          = var.project_tag
 }
 
 ###############################################################################
@@ -35,7 +34,7 @@ module "compute" {
   labels             = var.project_tag
   primary_zone       = var.default_zone
   web_zones          = var.zones
-  public_subnet_id   = module.network.public_subnet_id
+  public_subnet_id   = module.network.public_subnet_ids[var.default_zone]
   private_subnet_ids = module.network.private_subnet_ids
   security_groups    = module.network.security_groups
 }
@@ -44,15 +43,22 @@ module "compute" {
 # Фаза 3: Application Load Balancer
 ###############################################################################
 
-# module "alb" {
-#   source              = "./modules/alb"
-#   folder_id           = var.folder_id
-#   network_id          = module.network.network_id
-#   public_subnet_id    = module.network.public_subnet_id
-#   alb_security_group  = module.network.security_groups.alb
-#   web_targets         = module.compute.web_instances
-#   labels              = var.project_tag
-# }
+module "alb" {
+  source = "./modules/alb"
+
+  network_id            = module.network.network_id
+  public_subnet_ids     = module.network.public_subnet_ids
+  alb_security_group_id = module.network.security_groups.alb
+  labels                = var.project_tag
+
+  # Targets — приватные IP web-серверов в их подсетях
+  web_targets = [
+    for name, vm in module.compute.web : {
+      subnet_id  = module.network.private_subnet_ids[vm.zone]
+      ip_address = vm.internal_ip
+    }
+  ]
+}
 
 ###############################################################################
 # Фаза 4: Snapshot schedule

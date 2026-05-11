@@ -10,9 +10,9 @@ output "network_id" {
   value       = module.network.network_id
 }
 
-output "public_subnet_id" {
-  description = "ID публичной подсети"
-  value       = module.network.public_subnet_id
+output "public_subnet_ids" {
+  description = "Map: зона => ID публичной подсети"
+  value       = module.network.public_subnet_ids
 }
 
 output "private_subnet_ids" {
@@ -54,9 +54,14 @@ output "inventory" {
   }
 }
 
-# --- alb (после Фазы 3) ---
+# --- alb ---
 
-# output "alb_public_ip" {
-#   description = "Публичный IP Application Load Balancer"
-#   value       = module.alb.public_ip
-# }
+output "alb_public_ip" {
+  description = "Публичный IP Application Load Balancer"
+  value       = module.alb.public_ip
+}
+
+output "alb_id" {
+  description = "ID ALB"
+  value       = module.alb.alb_id
+}
