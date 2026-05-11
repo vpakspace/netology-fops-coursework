@@ -20,7 +20,7 @@ variable "alb_security_group_id" {
 }
 
 variable "web_targets" {
-  description = "Список targets для target group. Каждый — приватная подсеть и IP web-сервера."
+  description = "Targets для основной web target group (web-a, web-b)."
   type = list(object({
     subnet_id  = string
     ip_address = string
@@ -28,9 +28,31 @@ variable "web_targets" {
 }
 
 variable "healthcheck_path" {
-  description = "URL path для healthcheck на web-серверах. По README диплома — корень (/)."
+  description = "URL path для healthcheck web-серверов. По README диплома — корень (/)."
   type        = string
   default     = "/"
+}
+
+# --- host-based routing для UI-сервисов ---
+
+variable "extra_backends" {
+  description = <<-EOT
+    Дополнительные backends (например, grafana/kibana) для маршрутизации
+    по Host-header. Каждый — отдельный virtual_host на том же ALB :80.
+
+    authority — список Host-имён которые маршрутизируются на этот backend.
+    Пример: ["grafana.111-88-151-44.sslip.io"].
+  EOT
+  type = map(object({
+    target = object({
+      subnet_id  = string
+      ip_address = string
+    })
+    port             = number
+    healthcheck_path = string
+    authority        = list(string)
+  }))
+  default = {}
 }
 
 variable "labels" {

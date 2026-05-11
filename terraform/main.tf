@@ -58,6 +58,31 @@ module "alb" {
       ip_address = vm.internal_ip
     }
   ]
+
+  # ALB host-based routing для UI-сервисов:
+  # grafana.<ALB_IP_DASHES>.sslip.io → grafana:3000
+  # kibana.<ALB_IP_DASHES>.sslip.io  → kibana:5601
+  # ALB IP постоянен (managed static), sslip.io отдаёт wildcard DNS.
+  extra_backends = {
+    grafana = {
+      target = {
+        subnet_id  = module.network.public_subnet_ids[var.default_zone]
+        ip_address = module.compute.grafana.internal_ip
+      }
+      port             = 3000
+      healthcheck_path = "/api/health"
+      authority        = ["grafana.111-88-151-44.sslip.io"]
+    }
+    kibana = {
+      target = {
+        subnet_id  = module.network.public_subnet_ids[var.default_zone]
+        ip_address = module.compute.kibana.internal_ip
+      }
+      port             = 5601
+      healthcheck_path = "/api/status"
+      authority        = ["kibana.111-88-151-44.sslip.io"]
+    }
+  }
 }
 
 ###############################################################################

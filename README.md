@@ -17,72 +17,80 @@
 ## Архитектура
 
 ```
-                                Internet
+                              Internet
+                                 │
+                                 ▼
+                      ┌──────────────────────┐
+                      │    ALB (1 static IP) │
+                      │   111.88.151.44 :80  │
+                      │   zones A + B        │
+                      └──┬───────┬───────┬───┘
+            Host-based routing   │       │
+                       │         │       │
+        Host=111.88…  Host=grafana…   Host=kibana…
+            │             │              │
+            ▼             ▼              ▼
+       ┌────────┐    ┌─────────┐    ┌────────┐
+       │ web-a  │    │ Grafana │    │ Kibana │
+       │ zone A │    │ (public │    │ (public│
+       │ priv-a │    │  zone A)│    │  zone A)
+       └─┬──────┘    └────┬────┘    └───┬────┘
+       ┌─┴──────┐         │ datasource  │ ELASTICSEARCH_HOSTS
+       │ web-b  │         │             │
+       │ zone B │         ▼             ▼
+       │ priv-b │    ┌──────────┐  ┌──────────────┐
+       └──┬─────┘    │Prometheus│  │Elasticsearch │
+          │ scrape   │ priv-a   │  │ priv-a docker│
+          │ 9100/4040│   :9090  │  │    :9200     │
+          └──────────►          │  ▲              │
+                     └──────────┘  │ filebeat (web)
                                    │
-                       ┌───────────┴───────────┐
-                       │                       │
-                       ▼                       ▼
-                 ┌──────────┐             ┌──────────┐
-                 │   ALB    │ :80         │ Bastion  │ :22
-                 │ (zones   │             │ (public) │
-                 │  A + B)  │             └────┬─────┘
-                 └─────┬────┘                  │ ssh ProxyJump
-            HTTP route │                       │
-                       │                       ▼
-       ┌───────────────┴───────────────┐    ╔══════════════════════════════╗
-       ▼                               ▼    ║    Доступ ко всем приватным  ║
-  ┌──────────┐                   ┌──────────┐
-  │  web-a   │ nginx :80         │  web-b   │ nginx :80
-  │  zone A  │ + node_exp :9100  │  zone B  │ + node_exp :9100
-  │ (priv-a) │ + nle :4040       │ (priv-b) │ + nle :4040
-  │          │ + filebeat (docker)          │ + filebeat (docker)
-  └────┬─────┘                   └────┬─────┘
-       │ scrape (9100, 4040)           │
-       │                               │
-       ├────→ Prometheus :9090 (priv-a) ←── datasource ──┐
-       │                                                 │
-       │ filebeat → http                                 │
-       └────→ Elasticsearch :9200 (priv-a, docker)       │
-                  ▲                                      │
-                  │ HTTP                                 │
-              ┌───┴────┐                            ┌────┴───┐
-              │ Kibana │ :5601 (public)             │Grafana │ :3000 (public)
-              │ docker │                            │ docker │
-              └────────┘                            └────────┘
+                  bastion (public, SSH-вход для админа)
+                  через него — ProxyJump ко всем приватным
 
+  sslip.io: wildcard DNS, превращает grafana.111-88-151-44.sslip.io → 111.88.151.44
   Snapshot Schedule: ежедневно 02:00 MSK, retention 7d, все 7 boot-дисков
+  Keep-running cron: каждые 15 мин стартует упавшие preemptible ВМ
 ```
 
 **1 VPC**, **3 подсети** (public-a, public-b, private-a, private-b), **NAT gateway** для исходящего трафика из приватных, **7 security groups** по ролям, **bastion** как единственная точка SSH-входа.
 
 ## Доступы
 
+Все три HTTP-UI идут через **один static ALB IP** — `111.88.151.44`. Маршрутизация
+по `Host:` header'у, поддомены через **sslip.io** (wildcard DNS из IP-в-имени).
+Это снимает необходимость в нескольких static IP и гарантирует стабильные URL
+независимо от рестартов preemptible-ВМ.
+
 | Сервис | URL | Авторизация |
 |--------|-----|-------------|
-| **Сайт (через ALB)** | <http://111.88.151.44/> | — |
-| **Grafana** | <http://93.77.176.221:3000/> | анонимный Viewer (read-only) / admin/diplom-admin |
-| **Kibana** | <http://89.169.149.49:5601/> | без auth (x-pack отключён) |
+| **Сайт (web-a / web-b за ALB)** | <http://111.88.151.44/> | — |
+| **Grafana** | <http://grafana.111-88-151-44.sslip.io/> | анонимный Viewer (read-only) / admin: `admin/diplom-admin` |
+| **Kibana** | <http://kibana.111-88-151-44.sslip.io/> | без auth (x-pack отключён) |
 | **Prometheus** | через SSH-туннель (см. ниже) | без auth |
-| **bastion (SSH)** | `89.169.133.249` | ключ `~/.ssh/yc_diplom` |
+| **bastion (SSH)** | ephemeral IP, см. `terraform output bastion_public_ip` | ключ `~/.ssh/yc_diplom` |
 
-**SSH к приватным ВМ через bastion:**
+**Актуальные IP** (генерируются при каждом `terraform apply`):
 
 ```bash
-# web-a (zone A)
-ssh -i ~/.ssh/yc_diplom -J ubuntu@89.169.133.249 ubuntu@10.10.10.23
-# web-b (zone B)
-ssh -i ~/.ssh/yc_diplom -J ubuntu@89.169.133.249 ubuntu@10.10.20.28
-# Prometheus
-ssh -i ~/.ssh/yc_diplom -J ubuntu@89.169.133.249 ubuntu@10.10.10.11
-# Elasticsearch
-ssh -i ~/.ssh/yc_diplom -J ubuntu@89.169.133.249 ubuntu@10.10.10.30
+cd terraform/ && terraform output
+# → bastion_public_ip, web_internal_ips, etc.
+```
+
+**SSH к приватным ВМ через bastion** (BASTION_IP взять из output выше):
+
+```bash
+ssh -i ~/.ssh/yc_diplom -J ubuntu@$BASTION_IP ubuntu@10.10.10.23   # web-a
+ssh -i ~/.ssh/yc_diplom -J ubuntu@$BASTION_IP ubuntu@10.10.20.28   # web-b
+ssh -i ~/.ssh/yc_diplom -J ubuntu@$BASTION_IP ubuntu@10.10.10.11   # prometheus
+ssh -i ~/.ssh/yc_diplom -J ubuntu@$BASTION_IP ubuntu@10.10.10.30   # elasticsearch
 ```
 
 **SSH-туннель к Prometheus UI** (через grafana — SG разрешает 9090 только оттуда):
 
 ```bash
 ssh -i ~/.ssh/yc_diplom -L 9090:10.10.10.11:9090 \
-    -J ubuntu@89.169.133.249 ubuntu@10.10.1.23 -N
+    -J ubuntu@$BASTION_IP ubuntu@10.10.1.23 -N
 # в браузере: http://localhost:9090/classic/targets
 ```
 

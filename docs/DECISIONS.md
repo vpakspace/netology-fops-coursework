@@ -42,6 +42,34 @@
 
 **Причина**: web-серверы должны качать `apt` и docker-образы. Альтернатива — установить всё через bastion в качестве SSH proxy — сложнее в Ansible.
 
+### Host-based routing через один ALB IP + sslip.io
+
+**Решение**: единый static ALB-IP `111.88.151.44` обслуживает все три HTTP-UI.
+Маршрутизация по `Host:` header'у через ALB `virtual_host.authority`. Поддомены
+выдаёт публичный wildcard-DNS [sslip.io](https://sslip.io/), который превращает
+`grafana.111-88-151-44.sslip.io` → `111.88.151.44`.
+
+```
+http://111.88.151.44/                       →  web (web-a + web-b)
+http://grafana.111-88-151-44.sslip.io/      →  Grafana :3000
+http://kibana.111-88-151-44.sslip.io/       →  Kibana :5601
+```
+
+**Причина**: trial-аккаунт YC даёт **1 static IP** на cloud, и он уже занят ALB.
+Альтернативы:
+- Запрашивать увеличение квоты — медленно (ждать аппрува), требует ручного UI.
+- Покупать домен — лишний расход для учебного проекта.
+- Жить с ephemeral IP grafana/kibana — после остановки/старта preemptible ВМ IP
+  меняется, ссылки руководителю ломаются.
+
+Решение через sslip.io решает все три проблемы сразу: один IP, нет покупок,
+URLs стабильны как сам ALB IP.
+
+**Компромисс**: зависимость от sslip.io как от внешнего DNS-сервиса (Cloud
+Foundry проект, open-source). Если sslip.io ляжет — URL сломаются. Для
+production это была бы своя `grafana.mycompany.com` через Yandex Cloud DNS,
+но домен нужно купить.
+
 ### Multi-AZ ALB: две публичные подсети
 
 **Решение**: добавлена вторая публичная подсеть в zone B (`10.10.2.0/24`). ALB живёт в обеих зонах (`allocation_policy.location`).

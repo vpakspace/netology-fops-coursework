@@ -166,10 +166,17 @@ resource "yandex_vpc_security_group" "grafana" {
   }
 
   ingress {
-    description    = "Grafana UI from anywhere"
-    protocol       = "TCP"
-    port           = 3000
-    v4_cidr_blocks = ["0.0.0.0/0"]
+    description       = "Grafana :3000 from ALB only"
+    protocol          = "TCP"
+    port              = 3000
+    security_group_id = yandex_vpc_security_group.alb.id
+  }
+
+  ingress {
+    description       = "Grafana healthchecks from YC ALB"
+    protocol          = "TCP"
+    port              = 3000
+    predefined_target = "loadbalancer_healthchecks"
   }
 
   egress {
@@ -237,10 +244,17 @@ resource "yandex_vpc_security_group" "kibana" {
   }
 
   ingress {
-    description    = "Kibana UI from anywhere"
-    protocol       = "TCP"
-    port           = 5601
-    v4_cidr_blocks = ["0.0.0.0/0"]
+    description       = "Kibana :5601 from ALB only"
+    protocol          = "TCP"
+    port              = 5601
+    security_group_id = yandex_vpc_security_group.alb.id
+  }
+
+  ingress {
+    description       = "Kibana healthchecks from YC ALB"
+    protocol          = "TCP"
+    port              = 5601
+    predefined_target = "loadbalancer_healthchecks"
   }
 
   egress {
