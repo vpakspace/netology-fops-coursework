@@ -1,0 +1,16 @@
+---
+# nginx
+web_content_dir: /var/www/diplom
+
+# nginx-log-exporter (https://github.com/martin-helmich/prometheus-nginxlog-exporter)
+nginxlog_exporter_version: "1.11.0"
+nginxlog_exporter_port: 4040
+
+# Filebeat
+filebeat_image: "docker.elastic.co/beats/filebeat:7.17.27"
+filebeat_data_dir: /var/lib/filebeat
+filebeat_config_dir: /etc/filebeat
+
+# Куда отправлять логи. Хост берётся из inventory (group=logging, host=elasticsearch).
+filebeat_es_host: "{{ hostvars['elasticsearch']['ansible_host'] }}"
+filebeat_es_port: 9200

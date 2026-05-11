@@ -1,0 +1,50 @@
+---
+- name: "Install nginx"
+  ansible.builtin.apt:
+    name: nginx
+    state: present
+
+- name: "Ensure document root"
+  ansible.builtin.file:
+    path: "{{ web_content_dir }}"
+    state: directory
+    owner: www-data
+    group: www-data
+    mode: '0755'
+
+- name: "Deploy index.html (с актуальным hostname)"
+  ansible.builtin.template:
+    src: index.html.j2
+    dest: "{{ web_content_dir }}/index.html"
+    owner: www-data
+    group: www-data
+    mode: '0644'
+  notify: reload nginx
+
+- name: "Deploy diplom site config"
+  ansible.builtin.template:
+    src: diplom.conf.j2
+    dest: /etc/nginx/sites-available/diplom
+    owner: root
+    group: root
+    mode: '0644'
+  notify: reload nginx
+
+- name: "Enable diplom site"
+  ansible.builtin.file:
+    src: /etc/nginx/sites-available/diplom
+    dest: /etc/nginx/sites-enabled/diplom
+    state: link
+  notify: reload nginx
+
+- name: "Disable default site"
+  ansible.builtin.file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: reload nginx
+
+- name: "Ensure nginx running & enabled"
+  ansible.builtin.systemd:
+    name: nginx
+    state: started
+    enabled: true

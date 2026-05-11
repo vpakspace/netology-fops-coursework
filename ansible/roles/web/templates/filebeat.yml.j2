@@ -1,0 +1,37 @@
+# {{ ansible_managed }}
+# Filebeat 7.17 — отправка логов nginx в Elasticsearch single-node.
+
+filebeat.inputs:
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/nginx/access.log
+    fields:
+      log_type: nginx_access
+    fields_under_root: true
+
+  - type: log
+    enabled: true
+    paths:
+      - /var/log/nginx/error.log
+    fields:
+      log_type: nginx_error
+    fields_under_root: true
+
+processors:
+  - add_host_metadata: ~
+  - add_fields:
+      target: ''
+      fields:
+        host_name: '{{ inventory_hostname }}'
+
+output.elasticsearch:
+  hosts: ["http://{{ filebeat_es_host }}:{{ filebeat_es_port }}"]
+  index: "nginx-%{+yyyy.MM.dd}"
+
+setup.template.name: "nginx"
+setup.template.pattern: "nginx-*"
+setup.ilm.enabled: false
+
+logging.level: info
+logging.metrics.enabled: false

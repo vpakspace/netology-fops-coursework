@@ -20,12 +20,12 @@
     - role: common
       tags: [common, always]
 
-# - name: "Web-серверы: nginx + статика + node_exporter + nginx_log_exporter + filebeat"
-#   hosts: web
-#   become: true
-#   roles:
-#     - role: web
-#       tags: [web]
+- name: "Web-серверы: nginx + статика + node_exporter + nginx_log_exporter + filebeat"
+  hosts: web
+  become: true
+  roles:
+    - role: web
+      tags: [web]
 
 # - name: "Elasticsearch (docker)"
 #   hosts: logging:&elasticsearch  # эквивалент: только elasticsearch

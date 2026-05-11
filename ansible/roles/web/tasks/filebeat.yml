@@ -1,0 +1,42 @@
+---
+- name: "Ensure filebeat dirs"
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  loop:
+    - "{{ filebeat_config_dir }}"
+    - "{{ filebeat_data_dir }}"
+
+- name: "Deploy filebeat.yml"
+  ansible.builtin.template:
+    src: filebeat.yml.j2
+    dest: "{{ filebeat_config_dir }}/filebeat.yml"
+    owner: root
+    group: root
+    mode: '0600'   # filebeat требует strict perms
+  notify: restart filebeat
+
+- name: "Pull filebeat image"
+  community.docker.docker_image:
+    name: "{{ filebeat_image }}"
+    source: pull
+
+- name: "Run filebeat container"
+  community.docker.docker_container:
+    name: filebeat
+    image: "{{ filebeat_image }}"
+    state: started
+    restart_policy: unless-stopped
+    user: root
+    log_driver: json-file
+    log_options:
+      max-size: "10m"
+      max-file: "3"
+    command: ["filebeat", "-e", "-strict.perms=false"]
+    volumes:
+      - "{{ filebeat_config_dir }}/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro"
+      - "/var/log/nginx:/var/log/nginx:ro"
+      - "{{ filebeat_data_dir }}:/usr/share/filebeat/data"

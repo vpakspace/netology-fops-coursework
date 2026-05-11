@@ -1,0 +1,85 @@
+---
+###############################################################################
+# node_exporter — apt-пакет (proven, без internet-зависимостей кроме apt)
+###############################################################################
+- name: "Install prometheus-node-exporter"
+  ansible.builtin.apt:
+    name: prometheus-node-exporter
+    state: present
+
+- name: "Enable & start node_exporter"
+  ansible.builtin.systemd:
+    name: prometheus-node-exporter
+    state: started
+    enabled: true
+
+###############################################################################
+# nginx-log-exporter — martin-helmich, .deb с GitHub Releases
+###############################################################################
+- name: "Check installed nginx-log-exporter version"
+  ansible.builtin.command: dpkg-query -W -f='${Version}' prometheus-nginxlog-exporter
+  register: nle_pkg
+  changed_when: false
+  failed_when: false
+
+- name: "Download nginx-log-exporter .deb"
+  ansible.builtin.get_url:
+    url: "https://github.com/martin-helmich/prometheus-nginxlog-exporter/releases/download/v{{ nginxlog_exporter_version }}/prometheus-nginxlog-exporter_{{ nginxlog_exporter_version }}_linux_amd64.deb"
+    dest: "/tmp/prometheus-nginxlog-exporter_{{ nginxlog_exporter_version }}.deb"
+    mode: '0644'
+  when: nle_pkg.stdout != nginxlog_exporter_version
+
+- name: "Install nginx-log-exporter"
+  ansible.builtin.apt:
+    deb: "/tmp/prometheus-nginxlog-exporter_{{ nginxlog_exporter_version }}.deb"
+  when: nle_pkg.stdout != nginxlog_exporter_version
+
+- name: "Deploy nginx-log-exporter config"
+  ansible.builtin.template:
+    src: nginxlog-exporter.hcl.j2
+    dest: /etc/prometheus-nginxlog-exporter.hcl
+    owner: root
+    group: root
+    mode: '0644'
+  register: nle_config
+
+# systemd unit от .deb-пакета по умолчанию заворачивает процесс в namespace,
+# из-за которого /var/log/nginx/access.log недоступен даже от root. Явно
+# выставляем User=root + отключаем ProtectSystem через drop-in override.
+- name: "Ensure systemd drop-in dir for nginx-log-exporter"
+  ansible.builtin.file:
+    path: /etc/systemd/system/prometheus-nginxlog-exporter.service.d
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: "Drop-in: убрать sandbox-ограничения с unit"
+  ansible.builtin.copy:
+    dest: /etc/systemd/system/prometheus-nginxlog-exporter.service.d/override.conf
+    content: |
+      [Service]
+      User=root
+      Group=root
+      ProtectSystem=false
+      ProtectHome=false
+      PrivateTmp=false
+      ReadOnlyPaths=
+      InaccessiblePaths=
+      CapabilityBoundingSet=~
+    owner: root
+    group: root
+    mode: '0644'
+  register: nle_dropin
+
+- name: "Reset systemd failed-state"
+  ansible.builtin.command: systemctl reset-failed prometheus-nginxlog-exporter
+  changed_when: false
+  failed_when: false
+
+- name: "daemon-reload + restart exporter"
+  ansible.builtin.systemd:
+    name: prometheus-nginxlog-exporter
+    state: restarted
+    enabled: true
+    daemon_reload: true

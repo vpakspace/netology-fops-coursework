@@ -1,0 +1,16 @@
+---
+- name: "nginx"
+  ansible.builtin.include_tasks: nginx.yml
+  tags: [nginx]
+
+- name: "Exporters (node_exporter + nginx-log-exporter)"
+  ansible.builtin.include_tasks: exporters.yml
+  tags: [exporters, monitoring]
+
+- name: "Docker"
+  ansible.builtin.include_tasks: docker.yml
+  tags: [docker]
+
+- name: "Filebeat"
+  ansible.builtin.include_tasks: filebeat.yml
+  tags: [filebeat, logging]
