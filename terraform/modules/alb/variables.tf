@@ -28,9 +28,9 @@ variable "web_targets" {
 }
 
 variable "healthcheck_path" {
-  description = "URL path для healthcheck на web-серверах"
+  description = "URL path для healthcheck на web-серверах. По README диплома — корень (/)."
   type        = string
-  default     = "/healthz"
+  default     = "/"
 }
 
 variable "labels" {
