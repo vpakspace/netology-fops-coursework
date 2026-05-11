@@ -1,8 +1,7 @@
 ---
 galaxy_info:
-  role_name: web
-  author: vpakspace
-  description: "Web-сервер: nginx + node_exporter + nginx-log-exporter + filebeat (docker)"
+  role_name: kibana
+  description: "Kibana 7.17 в Docker"
   license: MIT
   min_ansible_version: "2.15"
   platforms:

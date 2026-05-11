@@ -7,10 +7,6 @@
   ansible.builtin.include_tasks: exporters.yml
   tags: [exporters, monitoring]
 
-- name: "Docker"
-  ansible.builtin.include_tasks: docker.yml
-  tags: [docker]
-
 - name: "Filebeat"
   ansible.builtin.include_tasks: filebeat.yml
   tags: [filebeat, logging]

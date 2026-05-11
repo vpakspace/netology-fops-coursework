@@ -1,0 +1,8 @@
+---
+elasticsearch_image: "docker.elastic.co/elasticsearch/elasticsearch:7.17.27"
+elasticsearch_data_dir: /var/lib/elasticsearch-data
+elasticsearch_logs_dir: /var/log/elasticsearch
+elasticsearch_heap_size: "1g"     # 4 GB RAM на ВМ — heap 1G + ОС + page cache
+elasticsearch_http_port: 9200
+elasticsearch_transport_port: 9300
+elasticsearch_cluster_name: "diplom-es"

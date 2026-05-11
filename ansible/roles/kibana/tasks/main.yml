@@ -1,0 +1,40 @@
+---
+- name: "Pull kibana image"
+  community.docker.docker_image:
+    name: "{{ kibana_image }}"
+    source: pull
+
+- name: "Run kibana container"
+  community.docker.docker_container:
+    name: kibana
+    image: "{{ kibana_image }}"
+    state: started
+    restart_policy: unless-stopped
+    log_driver: json-file
+    log_options:
+      max-size: "10m"
+      max-file: "3"
+    env:
+      ELASTICSEARCH_HOSTS: "http://{{ kibana_es_host }}:{{ kibana_es_port }}"
+      SERVER_HOST: "0.0.0.0"
+      SERVER_NAME: "diplom-kibana"
+      I18N_LOCALE: "ru-RU"
+    published_ports:
+      - "0.0.0.0:{{ kibana_port }}:5601"
+
+- name: "Wait for Kibana UI (max 120s)"
+  ansible.builtin.uri:
+    url: "http://localhost:{{ kibana_port }}/api/status"
+    method: GET
+    status_code: 200
+  register: kibana_status
+  until: kibana_status.status == 200
+  retries: 24
+  delay: 5
+  failed_when: false
+
+- name: "Kibana status"
+  ansible.builtin.debug:
+    msg: >
+      Kibana on http://localhost:{{ kibana_port }} —
+      status: {{ kibana_status.status | default('not ready') }}

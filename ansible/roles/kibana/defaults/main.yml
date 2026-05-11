@@ -1,0 +1,6 @@
+---
+kibana_image: "docker.elastic.co/kibana/kibana:7.17.27"
+kibana_port: 5601
+# Куда подключаться. Берём из inventory (хост в группе logging).
+kibana_es_host: "{{ hostvars['elasticsearch']['ansible_host'] }}"
+kibana_es_port: 9200

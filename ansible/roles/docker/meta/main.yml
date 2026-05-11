@@ -1,0 +1,11 @@
+---
+galaxy_info:
+  role_name: docker
+  description: "Установка Docker Engine + Compose plugin + python3-docker для community.docker"
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+dependencies: []

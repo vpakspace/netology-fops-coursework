@@ -1,8 +1,7 @@
 ---
 galaxy_info:
-  role_name: web
-  author: vpakspace
-  description: "Web-сервер: nginx + node_exporter + nginx-log-exporter + filebeat (docker)"
+  role_name: elasticsearch
+  description: "Elasticsearch 7.17 single-node в Docker"
   license: MIT
   min_ansible_version: "2.15"
   platforms:

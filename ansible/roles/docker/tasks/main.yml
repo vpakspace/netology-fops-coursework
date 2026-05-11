@@ -1,0 +1,22 @@
+---
+- name: "Install docker.io + compose plugin + python3-docker"
+  ansible.builtin.apt:
+    name:
+      - docker.io
+      - docker-compose-v2
+      - python3-docker
+    state: present
+    update_cache: true
+    cache_valid_time: 3600
+
+- name: "Enable & start docker"
+  ansible.builtin.systemd:
+    name: docker
+    state: started
+    enabled: true
+
+- name: "Add deploy user to docker group"
+  ansible.builtin.user:
+    name: "{{ ansible_user | default('ubuntu') }}"
+    groups: docker
+    append: true

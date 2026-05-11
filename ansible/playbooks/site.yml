@@ -27,19 +27,19 @@
     - role: web
       tags: [web]
 
-# - name: "Elasticsearch (docker)"
-#   hosts: logging:&elasticsearch  # эквивалент: только elasticsearch
-#   become: true
-#   roles:
-#     - role: elasticsearch
-#       tags: [elasticsearch, logging]
+- name: "Elasticsearch (docker, single-node 7.17)"
+  hosts: elasticsearch
+  become: true
+  roles:
+    - role: elasticsearch
+      tags: [elasticsearch, logging]
 
-# - name: "Kibana (docker)"
-#   hosts: kibana
-#   become: true
-#   roles:
-#     - role: kibana
-#       tags: [kibana, logging]
+- name: "Kibana (docker 7.17)"
+  hosts: kibana
+  become: true
+  roles:
+    - role: kibana
+      tags: [kibana, logging]
 
 # - name: "Prometheus"
 #   hosts: prometheus

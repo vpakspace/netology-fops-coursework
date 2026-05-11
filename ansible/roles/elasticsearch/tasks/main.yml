@@ -1,0 +1,83 @@
+---
+###############################################################################
+# Системные требования ES: vm.max_map_count >= 262144, mmap'ы для индекса.
+###############################################################################
+- name: "Set vm.max_map_count=262144 (ES requirement)"
+  ansible.builtin.copy:
+    dest: /etc/sysctl.d/99-elasticsearch.conf
+    content: |
+      vm.max_map_count=262144
+    owner: root
+    group: root
+    mode: '0644'
+  register: sysctl_es
+
+- name: "Reload sysctl"
+  ansible.builtin.command: sysctl --system
+  when: sysctl_es.changed
+  changed_when: false
+
+###############################################################################
+# Persistent data directory. uid=1000 — пользователь elasticsearch внутри контейнера.
+###############################################################################
+- name: "Ensure ES data dir"
+  ansible.builtin.file:
+    path: "{{ elasticsearch_data_dir }}"
+    state: directory
+    owner: '1000'
+    group: '1000'
+    mode: '0750'
+
+###############################################################################
+# Docker контейнер
+###############################################################################
+- name: "Pull elasticsearch image"
+  community.docker.docker_image:
+    name: "{{ elasticsearch_image }}"
+    source: pull
+
+- name: "Run elasticsearch container"
+  community.docker.docker_container:
+    name: elasticsearch
+    image: "{{ elasticsearch_image }}"
+    state: started
+    restart_policy: unless-stopped
+    log_driver: json-file
+    log_options:
+      max-size: "10m"
+      max-file: "3"
+    env:
+      discovery.type: "single-node"
+      cluster.name: "{{ elasticsearch_cluster_name }}"
+      node.name: "{{ inventory_hostname }}"
+      ES_JAVA_OPTS: "-Xms{{ elasticsearch_heap_size }} -Xmx{{ elasticsearch_heap_size }}"
+      xpack.security.enabled: "false"
+      bootstrap.memory_lock: "true"
+    ulimits:
+      - "memlock:-1:-1"
+      - "nofile:65536:65536"
+    published_ports:
+      - "0.0.0.0:{{ elasticsearch_http_port }}:9200"
+      - "0.0.0.0:{{ elasticsearch_transport_port }}:9300"
+    volumes:
+      - "{{ elasticsearch_data_dir }}:/usr/share/elasticsearch/data"
+
+###############################################################################
+# Подождать готовности ES (важно для последующих ролей и filebeat)
+###############################################################################
+- name: "Wait for ES /_cluster/health (max 90s)"
+  ansible.builtin.uri:
+    url: "http://localhost:{{ elasticsearch_http_port }}/_cluster/health"
+    method: GET
+    status_code: 200
+  register: es_health
+  until: es_health.status == 200 and (es_health.json.status in ['green', 'yellow'])
+  retries: 18
+  delay: 5
+
+- name: "ES cluster health"
+  ansible.builtin.debug:
+    msg: >
+      cluster: {{ es_health.json.cluster_name }}
+      status: {{ es_health.json.status }}
+      nodes: {{ es_health.json.number_of_nodes }}
