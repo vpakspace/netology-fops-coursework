@@ -1,0 +1,63 @@
+# Terraform
+**/.terraform/
+# .terraform.lock.hcl — КОММИТИМ (фиксация версий провайдеров)
+*.tfstate
+*.tfstate.*
+*.tfstate.backup
+crash.log
+crash.*.log
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
+.tfplan
+*.tfplan
+
+# Ansible
+*.retry
+ansible/inventory/inventory.yaml
+ansible/inventory/hosts.yaml
+ansible/inventory/hosts.ini
+ansible/inventory/*.json
+ansible/.vault_pass
+ansible/group_vars/*/vault.yml
+ansible/host_vars/*/vault.yml
+
+# SSH keys (на всякий случай — обычно лежат в ~/.ssh/)
+*.pem
+id_rsa
+id_ed25519
+yc_diplom
+yc_diplom.pub
+
+# YC CLI
+.yc/
+yc-config.yaml
+
+# Python / venv
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS / Editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+logs/
+
+# Прочее
+.env
+.env.local
+secrets/

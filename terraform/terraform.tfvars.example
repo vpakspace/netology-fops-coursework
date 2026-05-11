@@ -1,0 +1,25 @@
+###############################################################################
+# Скопируй этот файл в terraform.tfvars и подставь свои значения.
+# terraform.tfvars в .gitignore — никогда не коммить!
+###############################################################################
+
+# Получить:
+#   yc config get cloud-id
+#   yc config get folder-id
+cloud_id  = "b1g........."
+folder_id = "b1g........."
+
+# JSON-ключ сервисного аккаунта Terraform.
+# Создание:
+#   yc iam service-account create --name terraform
+#   yc iam key create --service-account-name terraform --output ~/.yc/terraform-sa-key.json
+sa_key_file = "/home/vladspace/.yc/terraform-sa-key.json"
+
+# Путь к публичному SSH-ключу (см. ~/.ssh/yc_diplom.pub)
+ssh_public_key_path = "/home/vladspace/.ssh/yc_diplom.pub"
+
+# Зона по умолчанию (для одиночных ВМ типа bastion, prometheus, и т.д.)
+default_zone = "ru-central1-a"
+
+# Если хочешь отключить preemptible (например, на время демо)
+# preemptible = false
