@@ -1,22 +1,29 @@
 ###############################################################################
 # Корневой модуль — оркестрирует sub-модули по фазам.
-# Реальные ресурсы появятся, когда будут готовы модули network/compute/alb/snapshots.
 ###############################################################################
 
-# Локальный data source для образа Ubuntu 22.04 LTS.
+# Образ Ubuntu 22.04 LTS — используется во всех ВМ.
 data "yandex_compute_image" "ubuntu" {
   family = var.image_family
 }
 
-# Заготовка под модули. Раскомментируем по мере добавления.
+###############################################################################
+# Фаза 1: Сеть (VPC, подсети, NAT, security groups)
+###############################################################################
 
-# module "network" {
-#   source              = "./modules/network"
-#   vpc_name            = var.vpc_name
-#   public_subnet_cidr  = var.public_subnet_cidr
-#   private_subnets     = var.private_subnets
-#   labels              = var.project_tag
-# }
+module "network" {
+  source = "./modules/network"
+
+  vpc_name           = var.vpc_name
+  public_subnet_cidr = var.public_subnet_cidr
+  public_subnet_zone = var.default_zone
+  private_subnets    = var.private_subnets
+  labels             = var.project_tag
+}
+
+###############################################################################
+# Фаза 2: Compute (bastion, web×2, prometheus, grafana, elasticsearch, kibana)
+###############################################################################
 
 # module "compute" {
 #   source              = "./modules/compute"
@@ -31,14 +38,23 @@ data "yandex_compute_image" "ubuntu" {
 #   security_groups     = module.network.security_groups
 # }
 
+###############################################################################
+# Фаза 3: Application Load Balancer
+###############################################################################
+
 # module "alb" {
 #   source              = "./modules/alb"
 #   folder_id           = var.folder_id
 #   network_id          = module.network.network_id
 #   public_subnet_id    = module.network.public_subnet_id
-#   web_vm_ips          = module.compute.web_private_ips
+#   alb_security_group  = module.network.security_groups.alb
+#   web_targets         = module.compute.web_instances
 #   labels              = var.project_tag
 # }
+
+###############################################################################
+# Фаза 4: Snapshot schedule
+###############################################################################
 
 # module "snapshots" {
 #   source              = "./modules/snapshots"
