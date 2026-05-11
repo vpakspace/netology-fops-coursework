@@ -1,0 +1,36 @@
+# {{ ansible_managed }}
+# Prometheus config for diplom project.
+
+global:
+  scrape_interval:     {{ prometheus_scrape_interval }}
+  evaluation_interval: {{ prometheus_evaluation_interval }}
+  external_labels:
+    monitor: 'diplom'
+
+scrape_configs:
+  # Сам Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:{{ prometheus_port }}']
+        labels:
+          group: 'monitoring'
+
+  # node_exporter на web-серверах (USE-метрики: CPU/RAM/диск/сеть)
+  - job_name: 'node_exporter'
+    static_configs:
+      - targets:
+{% for h in groups['web'] | sort %}
+          - '{{ hostvars[h]['ansible_host'] }}:{{ prometheus_node_exporter_port }}'
+{% endfor %}
+        labels:
+          group: 'web'
+
+  # nginx-log-exporter: nginx_http_response_count_total, _size_bytes, _time_seconds
+  - job_name: 'nginx_log_exporter'
+    static_configs:
+      - targets:
+{% for h in groups['web'] | sort %}
+          - '{{ hostvars[h]['ansible_host'] }}:{{ prometheus_nginxlog_exporter_port }}'
+{% endfor %}
+        labels:
+          group: 'web'

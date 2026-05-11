@@ -41,16 +41,16 @@
     - role: kibana
       tags: [kibana, logging]
 
-# - name: "Prometheus"
-#   hosts: prometheus
-#   become: true
-#   roles:
-#     - role: prometheus
-#       tags: [prometheus, monitoring]
+- name: "Prometheus"
+  hosts: prometheus
+  become: true
+  roles:
+    - role: prometheus
+      tags: [prometheus, monitoring]
 
-# - name: "Grafana"
-#   hosts: grafana
-#   become: true
-#   roles:
-#     - role: grafana
-#       tags: [grafana, monitoring]
+- name: "Grafana"
+  hosts: grafana
+  become: true
+  roles:
+    - role: grafana
+      tags: [grafana, monitoring]

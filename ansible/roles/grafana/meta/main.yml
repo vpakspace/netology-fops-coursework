@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  role_name: grafana
+  description: "Grafana 11 в Docker + provisioned datasource Prometheus + dashboards"
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+dependencies:
+  - role: docker

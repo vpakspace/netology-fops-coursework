@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+apiVersion: 1
+
+datasources:
+  - name: Prometheus
+    uid: prometheus
+    type: prometheus
+    access: proxy
+    url: http://{{ grafana_prometheus_host }}:{{ grafana_prometheus_port }}
+    isDefault: true
+    editable: true
+    jsonData:
+      timeInterval: "15s"

@@ -1,0 +1,9 @@
+---
+prometheus_port: 9090
+prometheus_scrape_interval: "15s"
+prometheus_evaluation_interval: "15s"
+prometheus_retention: "15d"
+
+# Группы целей для scrape. Адреса берутся из inventory.
+prometheus_node_exporter_port: 9100
+prometheus_nginxlog_exporter_port: 4040
