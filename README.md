@@ -245,6 +245,24 @@ cd terraform/ && terraform destroy -auto-approve
 ./scripts/gen_inventory.py    # перечитает terraform output и перепишет inventory.yaml
 ```
 
+### Keep alive до защиты (preemptible перезапуск раз в 24 ч)
+
+```bash
+# Каждые 15 минут стартует ВМ, если они в STOPPED
+crontab -e
+# */15 * * * * /home/vladspace/netology-diplom/scripts/keep-running.sh >> /tmp/keep-running.log 2>&1
+```
+
+После рестарта ВМ всё восстанавливается само: docker контейнеры (ES, Kibana,
+Grafana, filebeat) с `restart_policy: unless-stopped`, systemd-сервисы
+(nginx, prometheus, exporters) — `enabled=true`. Ручного `ansible-playbook`
+не требуется.
+
+После защиты — отключить cron:
+```bash
+crontab -l | grep -v keep-running | crontab -
+```
+
 ## Решения и компромиссы
 
 Полностью — в [`docs/DECISIONS.md`](docs/DECISIONS.md). Кратко:
