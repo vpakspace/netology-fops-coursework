@@ -23,13 +23,10 @@ flowchart TB
 
     subgraph VPC["VPC diplom-vpc · 10.10.0.0/16"]
         subgraph PubA["public-a · 10.10.1.0/24 · zone A"]
-            ALB["ALB · 111.88.151.44:80<br/>host-based routing"]
+            ALB["ALB · 111.88.151.44:80<br/>host-based routing<br/>multi-AZ: a + b"]
             Bastion["bastion"]
             Graf["grafana :3000"]
             Kib["kibana :5601"]
-        end
-        subgraph PubB["public-b · 10.10.2.0/24 · zone B"]
-            ALBb["ALB target zone B"]
         end
         subgraph PrivA["private-a · 10.10.10.0/24 · zone A"]
             WebA["web-a · nginx :80"]
