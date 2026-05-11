@@ -1,0 +1,56 @@
+---
+###############################################################################
+# Главный playbook дипломного проекта.
+#
+# Запуск:
+#   cd ansible/
+#   ansible-playbook playbooks/site.yml
+#
+# Точечный запуск по тегам:
+#   ansible-playbook playbooks/site.yml --tags common
+#
+# Поэтапная сборка — раскомментировать роли по мере готовности.
+###############################################################################
+
+- name: "Базовая настройка (все хосты)"
+  hosts: all
+  become: true
+  gather_facts: true
+  roles:
+    - role: common
+      tags: [common, always]
+
+# - name: "Web-серверы: nginx + статика + node_exporter + nginx_log_exporter + filebeat"
+#   hosts: web
+#   become: true
+#   roles:
+#     - role: web
+#       tags: [web]
+
+# - name: "Elasticsearch (docker)"
+#   hosts: logging:&elasticsearch  # эквивалент: только elasticsearch
+#   become: true
+#   roles:
+#     - role: elasticsearch
+#       tags: [elasticsearch, logging]
+
+# - name: "Kibana (docker)"
+#   hosts: kibana
+#   become: true
+#   roles:
+#     - role: kibana
+#       tags: [kibana, logging]
+
+# - name: "Prometheus"
+#   hosts: prometheus
+#   become: true
+#   roles:
+#     - role: prometheus
+#       tags: [prometheus, monitoring]
+
+# - name: "Grafana"
+#   hosts: grafana
+#   become: true
+#   roles:
+#     - role: grafana
+#       tags: [grafana, monitoring]

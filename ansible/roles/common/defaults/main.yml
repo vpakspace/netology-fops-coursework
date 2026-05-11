@@ -1,0 +1,19 @@
+---
+common_timezone: Europe/Moscow
+
+common_packages:
+  - curl
+  - wget
+  - vim
+  - htop
+  - net-tools
+  - dnsutils
+  - tcpdump
+  - ca-certificates
+  - gnupg
+  - lsb-release
+  - python3-pip
+  - jq
+  - unzip
+  - rsync
+  - tzdata

@@ -1,0 +1,12 @@
+---
+galaxy_info:
+  role_name: common
+  author: vpakspace
+  description: "Базовая настройка всех хостов: timezone, apt update, базовые пакеты"
+  license: MIT
+  min_ansible_version: "2.15"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+dependencies: []

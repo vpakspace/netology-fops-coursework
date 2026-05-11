@@ -1,0 +1,40 @@
+---
+- name: "Wait for cloud-init to finish"
+  ansible.builtin.command: cloud-init status --wait
+  changed_when: false
+  register: cloud_init_status
+  failed_when: cloud_init_status.rc not in [0, 2]
+
+- name: "Get current timezone"
+  ansible.builtin.command: timedatectl show -p Timezone --value
+  register: current_tz
+  changed_when: false
+
+- name: "Set timezone to {{ common_timezone }}"
+  ansible.builtin.command: "timedatectl set-timezone {{ common_timezone }}"
+  when: current_tz.stdout != common_timezone
+
+- name: "apt update"
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+- name: "Install base packages"
+  ansible.builtin.apt:
+    name: "{{ common_packages }}"
+    state: present
+
+- name: "Ensure /etc/hosts has 127.0.1.1 inventory_hostname"
+  ansible.builtin.lineinfile:
+    path: /etc/hosts
+    regexp: '^127\.0\.1\.1\s'
+    line: "127.0.1.1 {{ inventory_hostname }}"
+
+- name: "Show OS facts"
+  ansible.builtin.debug:
+    msg:
+      - "host:      {{ inventory_hostname }}"
+      - "os:        {{ ansible_distribution }} {{ ansible_distribution_version }}"
+      - "kernel:    {{ ansible_kernel }}"
+      - "tz:        {{ common_timezone }}"
+      - "python:    {{ ansible_python_version }}"
