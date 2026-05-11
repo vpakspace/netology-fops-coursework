@@ -1,0 +1,138 @@
+prometheus | CHANGED | rc=0 >>
+{
+    "status": "success",
+    "data": {
+        "activeTargets": [
+            {
+                "discoveredLabels": {
+                    "__address__": "10.10.10.23:4040",
+                    "__metrics_path__": "/metrics",
+                    "__scheme__": "http",
+                    "__scrape_interval__": "15s",
+                    "__scrape_timeout__": "10s",
+                    "group": "web",
+                    "job": "nginx_log_exporter"
+                },
+                "labels": {
+                    "group": "web",
+                    "instance": "10.10.10.23:4040",
+                    "job": "nginx_log_exporter"
+                },
+                "scrapePool": "nginx_log_exporter",
+                "scrapeUrl": "http://10.10.10.23:4040/metrics",
+                "globalUrl": "http://10.10.10.23:4040/metrics",
+                "lastError": "",
+                "lastScrape": "2026-05-11T11:18:28.174456205+03:00",
+                "lastScrapeDuration": 0.001746964,
+                "health": "up",
+                "scrapeInterval": "15s",
+                "scrapeTimeout": "10s"
+            },
+            {
+                "discoveredLabels": {
+                    "__address__": "10.10.20.28:4040",
+                    "__metrics_path__": "/metrics",
+                    "__scheme__": "http",
+                    "__scrape_interval__": "15s",
+                    "__scrape_timeout__": "10s",
+                    "group": "web",
+                    "job": "nginx_log_exporter"
+                },
+                "labels": {
+                    "group": "web",
+                    "instance": "10.10.20.28:4040",
+                    "job": "nginx_log_exporter"
+                },
+                "scrapePool": "nginx_log_exporter",
+                "scrapeUrl": "http://10.10.20.28:4040/metrics",
+                "globalUrl": "http://10.10.20.28:4040/metrics",
+                "lastError": "",
+                "lastScrape": "2026-05-11T11:18:24.782135171+03:00",
+                "lastScrapeDuration": 0.004629852,
+                "health": "up",
+                "scrapeInterval": "15s",
+                "scrapeTimeout": "10s"
+            },
+            {
+                "discoveredLabels": {
+                    "__address__": "10.10.20.28:9100",
+                    "__metrics_path__": "/metrics",
+                    "__scheme__": "http",
+                    "__scrape_interval__": "15s",
+                    "__scrape_timeout__": "10s",
+                    "group": "web",
+                    "job": "node",
+                    "nodename": "web-b"
+                },
+                "labels": {
+                    "group": "web",
+                    "instance": "10.10.20.28:9100",
+                    "job": "node",
+                    "nodename": "web-b"
+                },
+                "scrapePool": "node",
+                "scrapeUrl": "http://10.10.20.28:9100/metrics",
+                "globalUrl": "http://10.10.20.28:9100/metrics",
+                "lastError": "",
+                "lastScrape": "2026-05-11T11:18:19.4057134+03:00",
+                "lastScrapeDuration": 0.055125277,
+                "health": "up",
+                "scrapeInterval": "15s",
+                "scrapeTimeout": "10s"
+            },
+            {
+                "discoveredLabels": {
+                    "__address__": "10.10.10.23:9100",
+                    "__metrics_path__": "/metrics",
+                    "__scheme__": "http",
+                    "__scrape_interval__": "15s",
+                    "__scrape_timeout__": "10s",
+                    "group": "web",
+                    "job": "node",
+                    "nodename": "web-a"
+                },
+                "labels": {
+                    "group": "web",
+                    "instance": "10.10.10.23:9100",
+                    "job": "node",
+                    "nodename": "web-a"
+                },
+                "scrapePool": "node",
+                "scrapeUrl": "http://10.10.10.23:9100/metrics",
+                "globalUrl": "http://10.10.10.23:9100/metrics",
+                "lastError": "",
+                "lastScrape": "2026-05-11T11:18:22.658660808+03:00",
+                "lastScrapeDuration": 0.051408211,
+                "health": "up",
+                "scrapeInterval": "15s",
+                "scrapeTimeout": "10s"
+            },
+            {
+                "discoveredLabels": {
+                    "__address__": "localhost:9090",
+                    "__metrics_path__": "/metrics",
+                    "__scheme__": "http",
+                    "__scrape_interval__": "15s",
+                    "__scrape_timeout__": "10s",
+                    "group": "monitoring",
+                    "job": "prometheus"
+                },
+                "labels": {
+                    "group": "monitoring",
+                    "instance": "localhost:9090",
+                    "job": "prometheus"
+                },
+                "scrapePool": "prometheus",
+                "scrapeUrl": "http://localhost:9090/metrics",
+                "globalUrl": "http://prometheus:9090/metrics",
+                "lastError": "",
+                "lastScrape": "2026-05-11T11:18:25.003752586+03:00",
+                "lastScrapeDuration": 0.005374961,
+                "health": "up",
+                "scrapeInterval": "15s",
+                "scrapeTimeout": "10s"
+            }
+        ],
+        "droppedTargets": []
+    }
+}

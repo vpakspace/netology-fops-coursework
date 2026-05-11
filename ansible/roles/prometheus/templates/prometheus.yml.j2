@@ -15,15 +15,16 @@ scrape_configs:
         labels:
           group: 'monitoring'
 
-  # node_exporter на web-серверах (USE-метрики: CPU/RAM/диск/сеть)
-  - job_name: 'node_exporter'
+  # node_exporter на web-серверах (USE-метрики: CPU/RAM/диск/сеть).
+  # job=node + nodename=<host> — для совместимости с дашбордом 1860.
+  - job_name: 'node'
     static_configs:
-      - targets:
 {% for h in groups['web'] | sort %}
-          - '{{ hostvars[h]['ansible_host'] }}:{{ prometheus_node_exporter_port }}'
-{% endfor %}
+      - targets: ['{{ hostvars[h]['ansible_host'] }}:{{ prometheus_node_exporter_port }}']
         labels:
           group: 'web'
+          nodename: '{{ h }}'
+{% endfor %}
 
   # nginx-log-exporter: nginx_http_response_count_total, _size_bytes, _time_seconds
   - job_name: 'nginx_log_exporter'

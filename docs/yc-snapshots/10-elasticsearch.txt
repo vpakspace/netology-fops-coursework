@@ -1,0 +1,42 @@
+### Cluster health
+elasticsearch | CHANGED | rc=0 >>
+{
+  "cluster_name" : "diplom-es",
+  "status" : "yellow",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 9,
+  "active_shards" : 9,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 1,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 90.0
+}
+
+### Indices
+elasticsearch | CHANGED | rc=0 >>
+health status index                            uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   .geoip_databases                 zMgTk92mSQ6JDgKgHLcRoQ   1   0         43            0       40mb           40mb
+green  open   .apm-custom-link                 qKJ8yBP1SqGD-eX18X_aeg   1   0          0            0       227b           227b
+yellow open   nginx-2026.05.11                 tAdNlMg0Tg-Hq5xVEWtaWA   1   1        316            0    447.8kb        447.8kb
+green  open   .apm-agent-configuration         uvkYo305TmupEA77LZkUGQ   1   0          0            0       227b           227b
+green  open   .kibana_7.17.27_001              Oo4z0ttpQoWiKiMYEctXwQ   1   0         17           25      2.9mb          2.9mb
+green  open   .async-search                    Z5t2MdRqTpOL4MLo2c8WGA   1   0          2            2       22kb           22kb
+green  open   .kibana_task_manager_7.17.27_001 njv_x2t6QWOqE1gWIhYCQQ   1   0         17         3778    549.1kb        549.1kb
+
+### Count документов в nginx-*
+elasticsearch | CHANGED | rc=0 >>
+{
+  "count" : 316,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  }
+}

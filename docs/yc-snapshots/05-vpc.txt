@@ -1,0 +1,56 @@
+### Network
++----------------------+------------+
+|          ID          |    NAME    |
++----------------------+------------+
+| enpch5407gg486q747r5 | diplom-vpc |
++----------------------+------------+
+
+
+### Subnets
++----------------------+----------------------------------+----------------------+----------------------+---------------+-----------------+
+|          ID          |               NAME               |      NETWORK ID      |    ROUTE TABLE ID    |     ZONE      |      RANGE      |
++----------------------+----------------------------------+----------------------+----------------------+---------------+-----------------+
+| e2l3kvbkhd0i8gt52htf | diplom-vpc-public-ru-central1-b  | enpch5407gg486q747r5 |                      | ru-central1-b | [10.10.2.0/24]  |
+| e2l6g5e05q86hdcf1hpi | diplom-vpc-private-ru-central1-b | enpch5407gg486q747r5 | enpkbqfutssdj2662ing | ru-central1-b | [10.10.20.0/24] |
+| e9b0779dpdjjmu55snjr | diplom-vpc-private-ru-central1-a | enpch5407gg486q747r5 | enpkbqfutssdj2662ing | ru-central1-a | [10.10.10.0/24] |
+| e9bkrd80adt8p00nk7eb | diplom-vpc-public-ru-central1-a  | enpch5407gg486q747r5 |                      | ru-central1-a | [10.10.1.0/24]  |
++----------------------+----------------------------------+----------------------+----------------------+---------------+-----------------+
+
+
+### Address (ALB)
++----------------------+-------------------------------+----------------+----------+------+
+|          ID          |             NAME              |    ADDRESS     | RESERVED | USED |
++----------------------+-------------------------------+----------------+----------+------+
+| e2lu11jrp77qj6ok4i86 | alb-ipv4-ds7o0niv6p0dqu95h9pe | 111.88.151.44  | true     | true |
+| e2lvb1t7j6q6ku946bhq |                               | 10.10.20.28    | false    | true |
+| e9b0n62d6c4rb0efghkf |                               | 10.10.1.23     | false    | true |
+| e9b42or58qrk0m4hr8rr |                               | 89.169.154.152 | false    | true |
+| e9bbvp4i9t0evhgoiblf |                               | 89.169.133.249 | false    | true |
+| e9bcjtgilvc4bdh21c6p |                               | 10.10.10.11    | false    | true |
+| e9bdpcmjaetp99srtj78 |                               | 93.77.176.221  | false    | true |
+| e9bhopeqqh31h2nm4373 |                               | 10.10.1.19     | false    | true |
+| e9bpbl09nhqojuh5pjcl |                               | 10.10.10.30    | false    | true |
+| e9bq69fmff8k3cf8q1kg |                               | 10.10.1.16     | false    | true |
+| e9bqnra5sur8kqkj43jl |                               | 10.10.10.23    | false    | true |
++----------------------+-------------------------------+----------------+----------+------+
+
+
+### Security Groups
++----------------------+---------------------------------+--------------------------------+----------------------+
+|          ID          |              NAME               |          DESCRIPTION           |      NETWORK-ID      |
++----------------------+---------------------------------+--------------------------------+----------------------+
+| enp1k2gtkfjacdfaaleh | prometheus-sg                   | Prometheus: SSH с bastion,     | enpch5407gg486q747r5 |
+|                      |                                 | 9090 с grafana                 |                      |
+| enp3qes225utvqfbv7ho | kibana-sg                       | Kibana: 5601 из интернета, SSH | enpch5407gg486q747r5 |
+|                      |                                 | с bastion                      |                      |
+| enp6c4hbf4aa2urbgbsh | alb-sg                          | HTTP from internet → ALB       | enpch5407gg486q747r5 |
+| enpg7pv39dlo9b7ss8lg | default-sg-enpch5407gg486q747r5 | Default security group for     | enpch5407gg486q747r5 |
+|                      |                                 | network                        |                      |
+| enpml492spf60pua2po2 | web-sg                          | Веб-серверы за ALB             | enpch5407gg486q747r5 |
+| enps29qjqpoamqmesjk0 | elasticsearch-sg                | Elasticsearch: 9200 от web и   | enpch5407gg486q747r5 |
+|                      |                                 | kibana, SSH с bastion          |                      |
+| enpum05n4mhbs899s5i9 | bastion-sg                      | SSH вход извне → bastion       | enpch5407gg486q747r5 |
+| enpvbs58626rmsa0l9kj | grafana-sg                      | Grafana: 3000 из интернета,    | enpch5407gg486q747r5 |
+|                      |                                 | SSH с bastion                  |                      |
++----------------------+---------------------------------+--------------------------------+----------------------+
+

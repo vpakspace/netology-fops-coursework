@@ -1,0 +1,28 @@
+bastion | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+web-b | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+kibana | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+web-a | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+elasticsearch | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+grafana | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+prometheus | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}

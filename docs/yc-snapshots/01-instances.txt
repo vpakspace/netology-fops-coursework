@@ -1,0 +1,12 @@
++----------------------+---------------+---------------+---------+----------------+-------------+
+|          ID          |     NAME      |    ZONE ID    | STATUS  |  EXTERNAL IP   | INTERNAL IP |
++----------------------+---------------+---------------+---------+----------------+-------------+
+| epd1e7ravtvp6u40hsu5 | web-b         | ru-central1-b | RUNNING |                | 10.10.20.28 |
+| fhm58alp42jhtpdg19ml | kibana        | ru-central1-a | RUNNING | 89.169.154.152 | 10.10.1.16  |
+| fhmfar59pve5p01cgdnd | web-a         | ru-central1-a | RUNNING |                | 10.10.10.23 |
+| fhmqdctslp3mehvqralp | prometheus    | ru-central1-a | RUNNING |                | 10.10.10.11 |
+| fhmqveqoa96iruvebp0b | bastion       | ru-central1-a | RUNNING | 89.169.133.249 | 10.10.1.19  |
+| fhmu4bs9u4974jkvdo3a | elasticsearch | ru-central1-a | RUNNING |                | 10.10.10.30 |
+| fhmv215ouhe4pt3k89oo | grafana       | ru-central1-a | RUNNING | 93.77.176.221  | 10.10.1.23  |
++----------------------+---------------+---------------+---------+----------------+-------------+
+

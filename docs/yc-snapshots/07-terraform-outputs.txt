@@ -1,0 +1,80 @@
+alb_id = "ds7o0niv6p0dqu95h9pe"
+alb_public_ip = "111.88.151.44"
+bastion_public_ip = "89.169.133.249"
+grafana_public_ip = "93.77.176.221"
+inventory = {
+  "bastion" = {
+    "disk_id" = "fhm88rk1muej00luvfmt"
+    "id" = "fhmqveqoa96iruvebp0b"
+    "internal_ip" = "10.10.1.19"
+    "name" = "bastion"
+    "public_ip" = "89.169.133.249"
+    "zone" = "ru-central1-a"
+  }
+  "elasticsearch" = {
+    "disk_id" = "fhmkrkeecd08qrdu73a5"
+    "id" = "fhmu4bs9u4974jkvdo3a"
+    "internal_ip" = "10.10.10.30"
+    "name" = "elasticsearch"
+    "zone" = "ru-central1-a"
+  }
+  "grafana" = {
+    "disk_id" = "fhm3qb6urrjenep16gvf"
+    "id" = "fhmv215ouhe4pt3k89oo"
+    "internal_ip" = "10.10.1.23"
+    "name" = "grafana"
+    "public_ip" = "93.77.176.221"
+    "zone" = "ru-central1-a"
+  }
+  "kibana" = {
+    "disk_id" = "fhmcr1ajs8a3qgvgi6u6"
+    "id" = "fhm58alp42jhtpdg19ml"
+    "internal_ip" = "10.10.1.16"
+    "name" = "kibana"
+    "public_ip" = "89.169.154.152"
+    "zone" = "ru-central1-a"
+  }
+  "prometheus" = {
+    "disk_id" = "fhmablkuk1epg3efrqn8"
+    "id" = "fhmqdctslp3mehvqralp"
+    "internal_ip" = "10.10.10.11"
+    "name" = "prometheus"
+    "zone" = "ru-central1-a"
+  }
+  "web" = {
+    "web-a" = {
+      "disk_id" = "fhm0uo4gq8203qho8ne7"
+      "id" = "fhmfar59pve5p01cgdnd"
+      "internal_ip" = "10.10.10.23"
+      "name" = "web-a"
+      "zone" = "ru-central1-a"
+    }
+    "web-b" = {
+      "disk_id" = "epdtn3n167v02blu8hk2"
+      "id" = "epd1e7ravtvp6u40hsu5"
+      "internal_ip" = "10.10.20.28"
+      "name" = "web-b"
+      "zone" = "ru-central1-b"
+    }
+  }
+}
+kibana_public_ip = "89.169.154.152"
+network_id = "enpch5407gg486q747r5"
+private_subnet_ids = {
+  "ru-central1-a" = "e9b0779dpdjjmu55snjr"
+  "ru-central1-b" = "e2l6g5e05q86hdcf1hpi"
+}
+public_subnet_ids = {
+  "ru-central1-a" = "e9bkrd80adt8p00nk7eb"
+  "ru-central1-b" = "e2l3kvbkhd0i8gt52htf"
+}
+security_groups = {
+  "alb" = "enp6c4hbf4aa2urbgbsh"
+  "bastion" = "enpum05n4mhbs899s5i9"
+  "elasticsearch" = "enps29qjqpoamqmesjk0"
+  "grafana" = "enpvbs58626rmsa0l9kj"
+  "kibana" = "enp3qes225utvqfbv7ho"
+  "prometheus" = "enp1k2gtkfjacdfaaleh"
+  "web" = "enpml492spf60pua2po2"
+}
+snapshot_schedule_id = "fd8gadgjhfqk1qkal5r6"

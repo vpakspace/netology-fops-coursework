@@ -1,0 +1,12 @@
++----------------------+------+-------------+---------------+--------+----------------------+-----------------+-------------+
+|          ID          | NAME |    SIZE     |     ZONE      | STATUS |     INSTANCE IDS     | PLACEMENT GROUP | DESCRIPTION |
++----------------------+------+-------------+---------------+--------+----------------------+-----------------+-------------+
+| epdtn3n167v02blu8hk2 |      | 10737418240 | ru-central1-b | READY  | epd1e7ravtvp6u40hsu5 |                 |             |
+| fhm0uo4gq8203qho8ne7 |      | 10737418240 | ru-central1-a | READY  | fhmfar59pve5p01cgdnd |                 |             |
+| fhm3qb6urrjenep16gvf |      | 10737418240 | ru-central1-a | READY  | fhmv215ouhe4pt3k89oo |                 |             |
+| fhm88rk1muej00luvfmt |      | 10737418240 | ru-central1-a | READY  | fhmqveqoa96iruvebp0b |                 |             |
+| fhmablkuk1epg3efrqn8 |      | 16106127360 | ru-central1-a | READY  | fhmqdctslp3mehvqralp |                 |             |
+| fhmcr1ajs8a3qgvgi6u6 |      | 10737418240 | ru-central1-a | READY  | fhm58alp42jhtpdg19ml |                 |             |
+| fhmkrkeecd08qrdu73a5 |      | 21474836480 | ru-central1-a | READY  | fhmu4bs9u4974jkvdo3a |                 |             |
++----------------------+------+-------------+---------------+--------+----------------------+-----------------+-------------+
+
