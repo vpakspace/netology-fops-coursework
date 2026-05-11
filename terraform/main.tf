@@ -61,12 +61,12 @@ module "alb" {
 }
 
 ###############################################################################
-# Фаза 4: Snapshot schedule
+# Фаза 4: Snapshot schedule (ежедневные снапшоты всех дисков, retention 7d)
 ###############################################################################
 
-# module "snapshots" {
-#   source              = "./modules/snapshots"
-#   folder_id           = var.folder_id
-#   disk_ids            = module.compute.all_disk_ids
-#   labels              = var.project_tag
-# }
+module "snapshots" {
+  source = "./modules/snapshots"
+
+  disk_ids = module.compute.all_disk_ids
+  labels   = var.project_tag
+}

@@ -54,6 +54,13 @@ output "inventory" {
   }
 }
 
+# --- snapshots ---
+
+output "snapshot_schedule_id" {
+  description = "ID расписания ежедневных снапшотов"
+  value       = module.snapshots.schedule_id
+}
+
 # --- alb ---
 
 output "alb_public_ip" {
