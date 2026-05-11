@@ -16,44 +16,73 @@
 
 ## Архитектура
 
-```
-                              Internet
-                                 │
-                                 ▼
-                      ┌──────────────────────┐
-                      │    ALB (1 static IP) │
-                      │   111.88.151.44 :80  │
-                      │   zones A + B        │
-                      └──┬───────┬───────┬───┘
-            Host-based routing   │       │
-                       │         │       │
-        Host=111.88…  Host=grafana…   Host=kibana…
-            │             │              │
-            ▼             ▼              ▼
-       ┌────────┐    ┌─────────┐    ┌────────┐
-       │ web-a  │    │ Grafana │    │ Kibana │
-       │ zone A │    │ (public │    │ (public│
-       │ priv-a │    │  zone A)│    │  zone A)
-       └─┬──────┘    └────┬────┘    └───┬────┘
-       ┌─┴──────┐         │ datasource  │ ELASTICSEARCH_HOSTS
-       │ web-b  │         │             │
-       │ zone B │         ▼             ▼
-       │ priv-b │    ┌──────────┐  ┌──────────────┐
-       └──┬─────┘    │Prometheus│  │Elasticsearch │
-          │ scrape   │ priv-a   │  │ priv-a docker│
-          │ 9100/4040│   :9090  │  │    :9200     │
-          └──────────►          │  ▲              │
-                     └──────────┘  │ filebeat (web)
-                                   │
-                  bastion (public, SSH-вход для админа)
-                  через него — ProxyJump ко всем приватным
+```mermaid
+flowchart TB
+    Internet([Internet])
+    Admin([Admin laptop])
 
-  sslip.io: wildcard DNS, превращает grafana.111-88-151-44.sslip.io → 111.88.151.44
-  Snapshot Schedule: ежедневно 02:00 MSK, retention 7d, все 7 boot-дисков
-  Keep-running cron: каждые 15 мин стартует упавшие preemptible ВМ
+    subgraph VPC["VPC diplom-vpc · 10.10.0.0/16"]
+        subgraph PubA["public-a · 10.10.1.0/24 · zone A"]
+            ALB["ALB · 111.88.151.44:80<br/>host-based routing"]
+            Bastion["bastion"]
+            Graf["grafana :3000"]
+            Kib["kibana :5601"]
+        end
+        subgraph PubB["public-b · 10.10.2.0/24 · zone B"]
+            ALBb["ALB target zone B"]
+        end
+        subgraph PrivA["private-a · 10.10.10.0/24 · zone A"]
+            WebA["web-a · nginx :80"]
+            Prom["prometheus :9090"]
+            ES[("elasticsearch :9200")]
+        end
+        subgraph PrivB["private-b · 10.10.20.0/24 · zone B"]
+            WebB["web-b · nginx :80"]
+        end
+        NAT(["NAT gateway"])
+    end
+
+    Internet -- "Host: 111.88.151.44" --> ALB
+    Internet -- "Host: grafana.*.sslip.io" --> ALB
+    Internet -- "Host: kibana.*.sslip.io"  --> ALB
+    Admin    -- "SSH 22 (admin CIDRs)"     --> Bastion
+
+    ALB --> WebA
+    ALB --> WebB
+    ALB --> Graf
+    ALB --> Kib
+
+    Bastion -. SSH ProxyJump .-> WebA
+    Bastion -. SSH ProxyJump .-> WebB
+    Bastion -. SSH ProxyJump .-> Prom
+    Bastion -. SSH ProxyJump .-> ES
+    Bastion -. SSH ProxyJump .-> Graf
+    Bastion -. SSH ProxyJump .-> Kib
+
+    Prom -- "scrape :9100/4040" --> WebA
+    Prom -- "scrape :9100/4040" --> WebB
+    Graf -- "datasource :9090"  --> Prom
+    Graf -- "datasource :9200"  --> ES
+    Kib  -- ":9200"             --> ES
+    WebA -- "filebeat → :9200"  --> ES
+    WebB -- "filebeat → :9200"  --> ES
+
+    WebA -. outbound .-> NAT
+    WebB -. outbound .-> NAT
+    Prom -. outbound .-> NAT
+    ES   -. outbound .-> NAT
+    NAT --> Internet
 ```
 
-**1 VPC**, **3 подсети** (public-a, public-b, private-a, private-b), **NAT gateway** для исходящего трафика из приватных, **7 security groups** по ролям, **bastion** как единственная точка SSH-входа.
+**Ключевые точки**:
+
+- **1 static ALB IP** (`111.88.151.44`) обслуживает 3 сервиса через host-based routing — сайт по IP, `grafana.*.sslip.io` и `kibana.*.sslip.io` через wildcard DNS sslip.io. Это снимает ограничение «1 static IP на trial-аккаунт» в YC.
+- **Web в двух AZ** (`web-a` в `ru-central1-a`, `web-b` в `ru-central1-b`) — отказоустойчивая балансировка.
+- **Bastion** — единственная точка SSH-входа извне; ко всем приватным — ProxyJump.
+- **NAT gateway** — единственный исходящий путь для всех private-ВМ (apt/docker pull).
+- **7 security groups** по ролям; ingress между ролями через `security_group_id` (не CIDR), SSH на bastion — через переменную `admin_ssh_cidrs`.
+- **Snapshot schedule** — ежедневно 02:00 MSK, retention 7d, все 7 boot-дисков.
+- **Keep-running cron** (локально на админской машине) — каждые 15 мин стартует упавшие preemptible ВМ.
 
 ## Доступы
 
