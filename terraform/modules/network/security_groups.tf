@@ -24,10 +24,10 @@ resource "yandex_vpc_security_group" "bastion" {
   labels      = var.labels
 
   ingress {
-    description    = "SSH from anywhere"
+    description    = "SSH from admin CIDRs (var.admin_ssh_cidrs)"
     protocol       = "TCP"
     port           = 22
-    v4_cidr_blocks = ["0.0.0.0/0"]
+    v4_cidr_blocks = var.admin_ssh_cidrs
   }
 
   egress {

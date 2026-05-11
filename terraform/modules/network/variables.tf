@@ -14,6 +14,12 @@ variable "private_subnets" {
   type        = map(string)
 }
 
+variable "admin_ssh_cidrs" {
+  description = "CIDRs с правом SSH-входа на bastion (порт 22). Передаётся из корневого модуля."
+  type        = list(string)
+  default     = ["0.0.0.0/0"]
+}
+
 variable "labels" {
   description = "Labels, которые навешиваются на все ресурсы модуля"
   type        = map(string)

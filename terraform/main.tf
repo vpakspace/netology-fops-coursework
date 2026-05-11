@@ -17,6 +17,7 @@ module "network" {
   vpc_name        = var.vpc_name
   public_subnets  = var.public_subnets
   private_subnets = var.private_subnets
+  admin_ssh_cidrs = var.admin_ssh_cidrs
   labels          = var.project_tag
 }
 
