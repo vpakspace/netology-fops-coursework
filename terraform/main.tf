@@ -25,18 +25,20 @@ module "network" {
 # Фаза 2: Compute (bastion, web×2, prometheus, grafana, elasticsearch, kibana)
 ###############################################################################
 
-# module "compute" {
-#   source              = "./modules/compute"
-#   image_id            = data.yandex_compute_image.ubuntu.id
-#   ssh_public_key      = file(var.ssh_public_key_path)
-#   ssh_user            = var.ssh_user
-#   preemptible         = var.preemptible
-#   labels              = var.project_tag
-#   network_id          = module.network.network_id
-#   public_subnet_id    = module.network.public_subnet_id
-#   private_subnet_ids  = module.network.private_subnet_ids
-#   security_groups     = module.network.security_groups
-# }
+module "compute" {
+  source = "./modules/compute"
+
+  image_id           = data.yandex_compute_image.ubuntu.id
+  ssh_public_key     = file(var.ssh_public_key_path)
+  ssh_user           = var.ssh_user
+  preemptible        = var.preemptible
+  labels             = var.project_tag
+  primary_zone       = var.default_zone
+  web_zones          = var.zones
+  public_subnet_id   = module.network.public_subnet_id
+  private_subnet_ids = module.network.private_subnet_ids
+  security_groups    = module.network.security_groups
+}
 
 ###############################################################################
 # Фаза 3: Application Load Balancer

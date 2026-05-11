@@ -1,0 +1,26 @@
+#cloud-config
+# Базовая конфигурация для всех ВМ дипломного проекта.
+# Создаёт пользователя, прокидывает SSH-ключ. Остальное — задача Ansible.
+
+users:
+  - name: ${ssh_user}
+    groups: [sudo, adm]
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    shell: /bin/bash
+    ssh_authorized_keys:
+      - ${ssh_public_key}
+
+# Подтянуть индексы пакетов на старте — но НЕ ставить обновления автоматически
+# (это сделает Ansible).
+package_update: true
+package_upgrade: false
+
+# Включаем сервис ssh, отключаем парольный вход
+ssh_pwauth: false
+disable_root: true
+
+write_files:
+  - path: /etc/profile.d/diplom-hostname.sh
+    permissions: '0644'
+    content: |
+      export PS1='\[\e[1;34m\]\u@\h\[\e[0m\]:\w\$ '
